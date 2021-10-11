@@ -1,10 +1,15 @@
 version: "3.8"
 
 services:
-  app:
+  api:
     build: .
     env_file:
       - .env
+    environment:
+      # If you don't have this environment variables in your
+      # terminal, put them in the .env file
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     ports:
       - "8000:8000"
 
@@ -13,6 +18,3 @@ services:
     image: mysql:5.7
     env_file:
       - .env
-    ports:
-      - "3306:3306"
-
