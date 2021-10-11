@@ -5,6 +5,24 @@ import requests
 from .config import settings
 
 
+def create_notion_block(content: str, bold=False, italics=False, code=False):
+    block = {
+        "type": "text",
+        "text": {"content": content},
+        "annotations": {},
+    }
+    if bold:
+        block["annotations"]["bold"] = True
+    if italics:
+        block["annotations"]["italics"] = True
+    if code:
+        block["annotations"]["code"] = True
+    if not bold and not italics and not code:
+        del block["annotations"]
+
+    return block
+
+
 def update_notion_text(blocks: List[Dict]):
     headers = {
         "Authorization": f"Bearer {settings.NOTION_KEY}",

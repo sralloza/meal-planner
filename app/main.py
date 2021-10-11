@@ -35,6 +35,11 @@ def get_application():
     @_app.on_event("startup")
     def on_startup():
         create_db_and_tables()
+
+        if not settings.PRODUCTION:
+            print("Warning: development env, skipping cronjobs")
+            return
+
         scheduler.print_jobs()
         scheduler.start()
         update_notion_meals()
