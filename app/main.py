@@ -6,6 +6,7 @@ from .api import router as api_router
 from .core.config import settings
 from .cron import scheduler, update_notion_meals
 from .db.utils import create_db_and_tables
+from .utils.misc import get_version
 from .utils.server import catch_errors
 
 # https://github.com/long2ice/fastapi-cache
@@ -13,7 +14,9 @@ from .utils.server import catch_errors
 
 
 def get_application():
-    _app = FastAPI(title="Meal Planner", docs_url=None, redoc_url="/docs")
+    _app = FastAPI(
+        title="Meal Planner", docs_url=None, redoc_url="/docs", version=get_version()
+    )
 
     _app.add_middleware(
         CORSMiddleware,
