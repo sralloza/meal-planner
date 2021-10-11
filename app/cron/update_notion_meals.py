@@ -1,6 +1,6 @@
 from .. import crud
-from ..deps.database import manual_db
 from ..core.notion import update_notion_text
+from ..deps.database import manual_db
 from ..schemas.meal import Meal
 from .base import scheduler
 
