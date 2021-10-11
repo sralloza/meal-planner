@@ -3,6 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
+from ..core.notion import create_notion_block
+
 
 class MealId(BaseModel):
     id: date = Field(alias="date")
@@ -34,19 +36,26 @@ class BaseMeal(BaseSimpleMeal):
             out.append(f"{self.dinner.lower()} (D)")
         return out
 
-    def describe(self, indent: int = 0):
-        start = " " * indent + "- "
-        msg = ""
+    def to_notion_blocks(self):
+        blocks = []
+
+        # Little alias for code reading
+        _cnb = create_notion_block
 
         if self.lunch1:
-            msg += f"{start} Comida: {self.lunch1.lower()}"
+            blocks.append(_cnb("  - Comida: "))
+            blocks.append(_cnb(self.lunch1.lower(), code=self.lunch1_frozen))
             if self.lunch2:
-                msg += f" y {self.lunch2.lower()}"
+                blocks.append(_cnb(" y "))
+                blocks.append(_cnb(self.lunch2.lower(), code=self.lunch2_frozen))
+
         if self.dinner:
-            if msg:
-                msg += "\n"
-            msg += f"{start} Cena: {self.dinner.lower()}"
-        return msg + "\n"
+            if blocks:
+                blocks.append(_cnb("\n"))
+            blocks.append(_cnb("  - Cena: "))
+            blocks.append(_cnb(self.dinner.lower(), code=self.dinner_frozen))
+
+        return blocks
 
 
 class Meal(BaseMeal, MealId):
