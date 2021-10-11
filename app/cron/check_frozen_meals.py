@@ -1,6 +1,6 @@
 from .. import crud
-from ..deps.database import manual_db
 from ..core.todoist import add_task
+from ..deps.database import manual_db
 from ..schemas.meal import Meal
 from .base import scheduler
 

@@ -3,8 +3,8 @@ from typing import List
 from pydantic import parse_obj_as
 
 from .. import crud
-from ..deps.database import manual_db
 from ..core.aws import save_meals
+from ..deps.database import manual_db
 from ..schemas.meal import Meal
 from .base import scheduler
 
