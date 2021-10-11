@@ -4,6 +4,7 @@ from pydantic import UUID4, BaseSettings, validator
 
 
 class Settings(BaseSettings):
+    PRODUCTION: bool = False
     ENABLE_PROMETHEUS: bool = False
 
     AWS_ACCESS_KEY_ID: str
