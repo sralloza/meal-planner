@@ -30,7 +30,7 @@ def update_notion_meals():
     if dat_meal:
         blocks.extend(dat_meal.to_notion_blocks())
 
-    if len(blocks) <= 2:
+    if len(blocks) <= 3:
         print("warning: not blocks detected in cron-script update-notion-meals")
         return
 
