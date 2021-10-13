@@ -45,6 +45,9 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
     def get_tomorrow(self, db: Session):
         return self.get_by_date_delta(db, delta_days=1)
 
+    def get_day_after_tomorrow(self, db: Session):
+        return self.get_by_date_delta(db, delta_days=2)
+
     def get_week(self, db: Session, *, week: int):
         return db.query(self.model).filter(func.weekofyear(self.model.id) == week).all()
 
