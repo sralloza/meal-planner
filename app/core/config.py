@@ -25,12 +25,14 @@ class Settings(BaseSettings):
     TODOIST_TOKEN: str
 
     # Database
-    DATABASE_URI: str = ""
     MYSQL_DATABASE: str
     MYSQL_HOST: str
     MYSQL_PASSWORD: str
     MYSQL_PORT: str
     MYSQL_USER: str
+
+    # Defined dinamically
+    DATABASE_URI: str = ""
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
