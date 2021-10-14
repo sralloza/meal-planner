@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     API_TOKEN: str
     NOTION_KEY: str
     NOTION_BLOCK_ID: UUID4
+    NOTION_ADD_DAY_AFTER_TOMORROW: bool = True
 
     TODOIST_TOKEN: str
     TODOIST_PROJECT_ID: int
