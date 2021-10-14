@@ -11,8 +11,8 @@ Features:
   - Add tasks to Todoist if some meal needs unfreezing the day before
   - Dabatase backup to AWS
 
-- with Notion
-- with Todoist
+- Notion integration.
+- Todoist integration.
 
 ## Deploy
 
