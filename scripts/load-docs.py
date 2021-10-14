@@ -59,10 +59,11 @@ def create_md(week: int, weekly_meals: List[Meal]):
 def rebuild_mkdocs_yml(weeks: List[int]):
     with MKDOCS_YML_PATH.open("rt", encoding="utf8") as fh:
         yml_content = yml.load(fh)
-    yml_content["nav"] = [{f"Semana {x}": f"{x}.md"} for x in weeks]
+    yml_content["nav"] = [{"Índice": "index.md"}]
+    yml_content["nav"] += [{f"Semana {x}": f"{x}.md"} for x in weeks]
 
     with MKDOCS_YML_PATH.open("wt", encoding="utf8") as fh:
-        yml.dump(yml_content, fh,)
+        yml.dump(yml_content, fh)
 
 
 if __name__ == "__main__":

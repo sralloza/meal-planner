@@ -1,18 +1,22 @@
+import datetime
 import json
 import locale
 import re
-from datetime import datetime
 from pathlib import Path
+from typing import List
 from urllib.parse import urljoin
 
 import click
 import requests
 from dateutil.parser import parse
+from fastapi.encoders import jsonable_encoder
+from pydantic import parse_file_as, parse_obj_as
 from ruamel.yaml import YAML
 
 from app.core.config import settings
+from app.schemas.meal import Meal
 
-PATTERN = r"## (?P<weekday>[\wáéó]+)\n(?P<lunch>[-\wáéó\n ]+)\n(?P<dinner>[-\wáéó ]+)\n"
+PATTERN = r"## (?P<weekday>[\wáéó]+)\n(?P<lunch>[\[\]\-\/()\wáéó\n ]+)\n(?P<dinner>[\[\]\-\/()\wáéó\n ]+)\n"
 MD_DIR = Path(__file__).parent.parent / "docs"
 MD_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".md"]
 YML_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".yml"]
@@ -20,6 +24,10 @@ JSON_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".json"]
 
 locale.setlocale(locale.LC_ALL, "es_ES.utf8")
 yaml = YAML()
+
+
+class ModifiedMeal(Meal):
+    date: datetime.date
 
 
 @click.group()
@@ -36,7 +44,7 @@ def convert_md_to_yml(date: str):
 
     matches = re.finditer(PATTERN, joined)
 
-    current_year = datetime.now().year
+    current_year = datetime.datetime.now().year
     try:
         first_date = parse(date).date()
         week_number = first_date.isocalendar()[1]
@@ -47,7 +55,7 @@ def convert_md_to_yml(date: str):
     for match in matches:
         parsed = match.groupdict()
         weekday = parsed["weekday"]
-        meal_date = datetime.strptime(
+        meal_date = datetime.datetime.strptime(
             f"{weekday} {week_number} {current_year}", "%A %W %Y"
         ).date()
         lunch = [x.strip("- ") for x in parsed["lunch"].splitlines()]
@@ -68,7 +76,9 @@ def convert_md_to_yml(date: str):
             click.secho("Not modified", fg="bright_yellow")
             return
 
-        click.confirm("YML file exists and will be modified. Continue?", abort=True)
+        click.confirm(
+            "YML file exists and will be modified. Continue?", abort=True, default=True
+        )
 
     with yaml_path.open("wt", encoding="utf8") as fh:
         current_data = yaml.dump(objs, fh)
@@ -83,27 +93,26 @@ def convert_yml_json(date: str):
     with filepath.open("rt", encoding="utf8") as fh:
         objs = yaml.load(fh)
 
-    for obj in objs:
-        obj["id"] = str(obj["date"])
-        del obj["id"]
+    parsed_data = parse_obj_as(List[ModifiedMeal], objs)
 
     json_path = MD_DIR / f"{date}.json"
     if json_path.is_file():
-        with json_path.open("rt", encoding="utf8") as fh:
-            current_data = json.load(fh)
+        current_data = parse_file_as(List[ModifiedMeal], json_path, encoding="utf8")
 
-        if current_data == objs:
+        if current_data == parsed_data:
             click.secho("Not modified", fg="bright_yellow")
             return
 
-        click.confirm("YML file exists and will be modified. Continue?", abort=True)
+        click.confirm(
+            "YML file exists and will be modified. Continue?", abort=True, default=True
+        )
 
     with json_path.open("wt", encoding="utf8") as fh:
-        current_data = json.dump(objs, fh, indent=2, ensure_ascii=False)
+        json.dump(jsonable_encoder(parsed_data), fh, indent=2, ensure_ascii=False)
 
 
 @cli.command("upload-json")
-@click.argument("date", metavar="DATE", type=click.Choice(MD_FILES))
+@click.argument("date", metavar="DATE", type=click.Choice(JSON_FILES))
 @click.argument("API_URL", envvar="MEAL_PLANNER_API_URL")
 def upload_json(date: str, api_url: str):
     filepath = MD_DIR / f"{date}.json"
