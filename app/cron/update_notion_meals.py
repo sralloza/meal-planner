@@ -1,4 +1,5 @@
 from .. import crud
+from ..core.config import settings
 from ..core.notion import create_notion_block, update_notion_text
 from ..deps.database import manual_db
 from ..schemas.meal import Meal
@@ -26,9 +27,10 @@ def update_notion_meals():
     if tomorrow_meal:
         blocks.extend(tomorrow_meal.to_notion_blocks())
 
-    blocks.append(create_notion_block("\nPasado mañana\n", bold=True))
-    if dat_meal:
-        blocks.extend(dat_meal.to_notion_blocks())
+    if settings.NOTION_ADD_DAY_AFTER_TOMORROW:
+        blocks.append(create_notion_block("\nPasado mañana\n", bold=True))
+        if dat_meal:
+            blocks.extend(dat_meal.to_notion_blocks())
 
     if len(blocks) <= 3:
         print("warning: not blocks detected in cron-script update-notion-meals")
