@@ -4,29 +4,33 @@ from pydantic import UUID4, BaseSettings, validator
 
 
 class Settings(BaseSettings):
-    PRODUCTION: bool = False
+    # Server
+    API_TOKEN: str
     ENABLE_PROMETHEUS: bool = False
+    PRODUCTION: bool = False
 
+    # AWS
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
-
-    API_TOKEN: str
-    NOTION_KEY: str
-    NOTION_BLOCK_ID: UUID4
-    NOTION_ADD_DAY_AFTER_TOMORROW: bool = True
-
-    TODOIST_TOKEN: str
-    TODOIST_PROJECT_ID: int
-
     S3_BUCKET_NAME: str
     S3_FILE_NAME: str = "meals.json"
 
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
-    MYSQL_HOST: str
-    MYSQL_PORT: str
-    MYSQL_DATABASE: str
+    # Notion
+    NOTION_ADD_DAY_AFTER_TOMORROW: bool = True
+    NOTION_BLOCK_ID: UUID4
+    NOTION_KEY: str
+
+    # Todoist
+    TODOIST_PROJECT_ID: int
+    TODOIST_TOKEN: str
+
+    # Database
     DATABASE_URI: str = ""
+    MYSQL_DATABASE: str
+    MYSQL_HOST: str
+    MYSQL_PASSWORD: str
+    MYSQL_PORT: str
+    MYSQL_USER: str
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
