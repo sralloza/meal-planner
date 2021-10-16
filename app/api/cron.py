@@ -1,10 +1,10 @@
 from enum import Enum
 
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends
 
+from ..cron import backup_database, check_frozen_meals, update_notion_meals
 from ..deps.security import token_middleware
 from ..utils.responses import gen_responses
-from ..cron import backup_database, check_frozen_meals, update_notion_meals
 
 router = APIRouter(
     tags=["Cron"],

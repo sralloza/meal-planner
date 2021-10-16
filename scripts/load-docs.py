@@ -1,5 +1,5 @@
-from itertools import groupby
 import locale
+from itertools import groupby
 from pathlib import Path
 from typing import List
 
