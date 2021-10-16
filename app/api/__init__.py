@@ -1,8 +1,8 @@
 from fastapi.routing import APIRouter
 
+from .cron import router as cron_router
 from .meals import router as meals_router
 from .utils import router as utils_router
-from .cron import router as cron_router
 
 router = APIRouter()
 
