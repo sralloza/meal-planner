@@ -17,7 +17,6 @@ router = APIRouter(
     dependencies=[Depends(token_middleware)],
     **gen_responses({401: "Missing Token", 403: "Invalid token"}),
 )
-meals = []
 
 
 class OutputEnum(Enum):
