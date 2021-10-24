@@ -45,11 +45,7 @@ def convert_md_to_yml(date: str):
     matches = re.finditer(PATTERN, joined)
 
     current_year = datetime.datetime.now().year
-    try:
-        first_date = parse(date).date()
-        week_number = first_date.isocalendar()[1]
-    except ValueError:
-        week_number = int(date)
+    week_number = int(date)
 
     objs = []
     for match in matches:
@@ -58,11 +54,13 @@ def convert_md_to_yml(date: str):
         meal_date = datetime.datetime.strptime(
             f"{weekday} {week_number} {current_year}", "%A %W %Y"
         ).date()
+
         lunch = [x.strip("- ") for x in parsed["lunch"].splitlines()]
         if len(lunch) == 2:
             lunch1, lunch2 = lunch
         else:
             lunch1, lunch2 = lunch[0], None
+
         dinner = parsed["dinner"].strip("- ")
         obj = dict(date=meal_date, lunch1=lunch1, lunch2=lunch2, dinner=dinner)
         objs.append(obj)
