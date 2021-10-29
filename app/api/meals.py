@@ -69,7 +69,7 @@ def get_meals_of_current_week(*, db=Depends(get_db), simple=Depends(simplify_ask
     response_model=List[Union[Meal, SimpleMeal]],
     summary="Get meals of next week",
 )
-def get_meals_of_next_week(*, b=Depends(get_db), simple=Depends(simplify_asked)):
+def get_meals_of_next_week(*, db=Depends(get_db), simple=Depends(simplify_asked)):
     """Returns all the meals from next week. Max 7 meals will be returned."""
     return simplify(
         crud.meal.get_week_delta(db, delta_weeks=1), List[SimpleMeal], simple
