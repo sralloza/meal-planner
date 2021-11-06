@@ -24,17 +24,11 @@ Notes:
 - The Dockerfile is designed to work on ARM systems, like a Raspberry Pi.
 
 ```shell
-# ARM (Raspberry Pi like) pushing it to dockerhub
-docker buildx build -t sralloza/meal-planner:stable-arm --platform=linux/arm/v7 --push .
+# Build and push it to dockerhub
+docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --push .
 
-# ARM (Raspberry Pi like) without pushing it to dockerhub
-docker buildx build -t sralloza/meal-planner:stable-arm --platform=linux/arm/v7 --load .
-
-# Normal build
-docker build -t sralloza/meal-planner:stable .
-
-# You'll probably want to push it to dockerhub
-docker push sralloza/meal-planner:stable
+# Build without pushing it to dockerhub
+docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --load .
 ```
 
 ## Environment
