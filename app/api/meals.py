@@ -1,14 +1,13 @@
 """Meal related API endpoints."""
 
 import datetime
-from enum import Enum
-from typing import Any, List, Union
+from typing import List, Union
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query
-from pydantic import parse_obj_as
+from fastapi import APIRouter, BackgroundTasks, Depends
 from starlette.responses import Response
 
 from .. import crud
+from ..core.meals import SwapMode, paginate, simplify, simplify_asked
 from ..cron.update_notion_meals import update_notion_meals
 from ..deps.database import get_db
 from ..deps.security import token_middleware
@@ -20,30 +19,6 @@ router = APIRouter(
     dependencies=[Depends(token_middleware)],
     **gen_responses({401: "Missing Token", 403: "Invalid token"}),
 )
-
-
-class OutputEnum(Enum):
-    """Output types for meals."""
-
-    SIMPLE = "simple"
-    NORMAL = "normal"
-
-
-def simplify_asked(output: OutputEnum = Query(None, description="Simplify output")):
-    """Returns true if the output must be simplified."""
-    return output == OutputEnum.SIMPLE
-
-
-def paginate(skip: int = 0, limit: int = 100):
-    """Returns the pagination."""
-    return {"skip": skip, "limit": limit}
-
-
-def simplify(input_data: Any, simplified_model: Any, simplify_flag: bool):
-    """Simplifies output if needed."""
-    if not simplify_flag:
-        return input_data
-    return parse_obj_as(simplified_model, input_data)
 
 
 @router.get(
@@ -171,6 +146,20 @@ def create_multiple_meals(
     )
     background_tasks.add_task(update_notion_meals)
     return result
+
+
+@router.put(
+    "/swap",
+    response_model=List[Union[Meal, SimpleMeal]],
+    response_model_exclude_unset=True,
+    summary="Swap meals",
+)
+def swap_meals(
+    *, db=Depends(get_db), meal_1: datetime.date, meal_2: datetime.date, mode: SwapMode
+):
+    """Swaps meal attributes."""
+
+    return crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode)
 
 
 @router.put(
