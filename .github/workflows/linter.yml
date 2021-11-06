@@ -13,18 +13,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Setup poetry
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ matrix.poetry-version }}
+
       - name: Install
         run: poetry install
-      - name: Lint with pylint
-        run: poetry run pylint app
-      - name: Check imports
-        run: poetry run isort --check app
+
       - name: Run black
         run: poetry run black --check app
+
+      - name: Check imports
+        run: poetry run isort --check app
+
+      - name: Lint with pylint
+        run: poetry run pylint app

@@ -14,6 +14,7 @@ from ..utils.misc import get_current_week
 
 class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
     """Meal CRUD operations."""
+
     def create_multiple(self, db: Session, *, obj_in: List[MealCreate]) -> List[Meal]:
         """Create multiple meals."""
         out = []

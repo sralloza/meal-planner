@@ -14,8 +14,10 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 # pylint: disable=redefined-builtin
 
+
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     """Base CRUD class."""
+
     def raise_not_found_error(self, *, id: Any):
         """Raise 404 NOT FOUND."""
         detail = f"{self.model.__name__} with id={id} does not exist"

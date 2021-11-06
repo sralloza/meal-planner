@@ -17,6 +17,7 @@ router = APIRouter(
 
 class ValidCron(Enum):
     """Defined crons that can be launched from the API."""
+
     BACKUP_DATABASE = "backup-database"
     CHECK_FROZEN_MEALS = "check-frozen-meals"
     UPDATE_NOTION_MEALS = "update-notion-meals"
