@@ -1,3 +1,5 @@
+"""Database utils."""
+
 from sqlalchemy_utils import create_database, database_exists
 
 from .base_class import Base

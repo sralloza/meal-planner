@@ -1,3 +1,5 @@
+"""Util related API endpoints."""
+
 from fastapi import APIRouter
 
 from ..utils.misc import get_version

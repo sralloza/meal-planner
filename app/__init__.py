@@ -1,3 +1,5 @@
+"""The meal-planner app."""
+
 from .utils.misc import get_version
 
 __version__ = get_version()

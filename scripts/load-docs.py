@@ -1,3 +1,5 @@
+"""Load docs script."""
+
 import locale
 from itertools import groupby
 from pathlib import Path
@@ -22,6 +24,7 @@ yml.indent(offset=2, sequence=4)
 @click.command()
 @click.argument("source", type=click.Choice(["aws", "db"]))
 def load_docs(source: str):
+    """Load the docs from AWS or the database."""
     if source == "aws":
         meals = get_meals()
     else:
@@ -38,6 +41,7 @@ def load_docs(source: str):
 
 
 def create_md(week: int, weekly_meals: List[Meal]):
+    """Creates the markdown file."""
     MD_DIR.mkdir(exist_ok=True)
     md_filepath = MD_DIR / f"{week}.md"
     content = ""
@@ -57,6 +61,7 @@ def create_md(week: int, weekly_meals: List[Meal]):
 
 
 def rebuild_mkdocs_yml(weeks: List[int]):
+    """Rebuilds the mkdocs.yml file."""
     with MKDOCS_YML_PATH.open("rt", encoding="utf8") as fh:
         yml_content = yml.load(fh)
     yml_content["nav"] = [{"Índice": "index.md"}]

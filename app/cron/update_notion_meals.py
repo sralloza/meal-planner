@@ -1,3 +1,5 @@
+"""Update notion meals cron sript."""
+
 from .. import crud
 from ..core.config import settings
 from ..core.notion import create_notion_block, update_notion_text
@@ -9,6 +11,7 @@ from .base import scheduler
 # Should fire everyday at 05:00
 @scheduler.scheduled_job("cron", id="update-notion-meals", hour="5", minute="0")
 def update_notion_meals():
+    """Update meals in notion page."""
     with manual_db() as db:
         today_meal = crud.meal.get_today(db)
         tomorrow_meal = crud.meal.get_tomorrow(db)

@@ -1,3 +1,5 @@
+"""Script to import data from AWS into the database using the API."""
+
 from urllib.parse import urljoin
 
 import click
@@ -11,6 +13,7 @@ from app.core.config import settings
 @click.command("import")
 @click.argument("API_URL", envvar="MEAL_PLANNER_API_URL")
 def import_aws_db(api_url):
+    """Imports the data from AWS into the database using the API."""
     click.confirm(f"Import AWS DB to {api_url!r}?", abort=True, default=True)
     headers = {"x-token": settings.API_TOKEN, "user-agent": "mealer"}
 

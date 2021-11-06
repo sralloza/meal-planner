@@ -1,3 +1,5 @@
+"""Config module."""
+
 from typing import Any, Dict, Optional
 
 from pydantic import UUID4, BaseSettings, validator

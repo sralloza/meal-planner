@@ -1,3 +1,5 @@
+"""Meal database model"""
+
 from sqlalchemy import Boolean, Column, Date, String
 from sqlalchemy.orm import synonym
 
@@ -7,6 +9,8 @@ from ..db.base_class import Base
 
 
 class Meal(Base):
+    """SQL model for meals."""
+
     id = Column(Date(), primary_key=True, index=True)
     date = synonym("id")
 

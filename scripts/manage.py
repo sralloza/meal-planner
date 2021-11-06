@@ -1,3 +1,5 @@
+"""Script to create a full week's menu."""
+
 import datetime
 import json
 import locale

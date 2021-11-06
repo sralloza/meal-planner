@@ -1,9 +1,11 @@
+"""Meal related API endpoints."""
+
 import datetime
 from enum import Enum
 from typing import Any, List, Union
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
-from pydantic.tools import parse_obj_as
+from pydantic import parse_obj_as
 from starlette.responses import Response
 
 from .. import crud
@@ -21,19 +23,24 @@ router = APIRouter(
 
 
 class OutputEnum(Enum):
-    simple = "simple"
-    normal = "normal"
+    """Output types for meals."""
+
+    SIMPLE = "simple"
+    NORMAL = "normal"
 
 
 def simplify_asked(output: OutputEnum = Query(None, description="Simplify output")):
-    return output == OutputEnum.simple
+    """Returns true if the output must be simplified."""
+    return output == OutputEnum.SIMPLE
 
 
 def paginate(skip: int = 0, limit: int = 100):
+    """Returns the pagination."""
     return {"skip": skip, "limit": limit}
 
 
 def simplify(input_data: Any, simplified_model: Any, simplify_flag: bool):
+    """Simplifies output if needed."""
     if not simplify_flag:
         return input_data
     return parse_obj_as(simplified_model, input_data)
@@ -198,9 +205,8 @@ def update_meal(
 )
 def delete_current_week(*, db=Depends(get_db), background_tasks: BackgroundTasks):
     """Delete all meals of a week."""
-    result = crud.meal.remove_current_week(db)
+    crud.meal.remove_current_week(db)
     background_tasks.add_task(update_notion_meals)
-    return result
 
 
 @router.delete(
@@ -211,9 +217,8 @@ def delete_current_week(*, db=Depends(get_db), background_tasks: BackgroundTasks
 )
 def delete_week(*, week: int, db=Depends(get_db), background_tasks: BackgroundTasks):
     """Delete all meals of a week."""
-    result = crud.meal.remove_week(db, week=week)
+    crud.meal.remove_week(db, week=week)
     background_tasks.add_task(update_notion_meals)
-    return result
 
 
 @router.delete(
@@ -227,6 +232,5 @@ def delete_single_meal(
     *, date: datetime.date, db=Depends(get_db), background_tasks: BackgroundTasks
 ):
     """Delete single meal."""
-    result = crud.meal.remove(db, id=date)
+    crud.meal.remove(db, id=date)
     background_tasks.add_task(update_notion_meals)
-    return result

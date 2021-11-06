@@ -1,3 +1,5 @@
+"""AWS Operations."""
+
 import tempfile
 from json import dumps
 from typing import List
@@ -13,13 +15,14 @@ from ..schemas.meal import Meal
 
 
 def get_meals() -> List[Meal]:
+    """Returns the meals saved in AWS."""
     s3 = boto3.client("s3")
     with tempfile.TemporaryFile() as fp:
         try:
             s3.download_fileobj(settings.S3_BUCKET_NAME, settings.S3_FILE_NAME, fp)
         except ClientError as exc:
             if "404" in str(exc):
-                raise HTTPException(404, "Meal not found")
+                raise HTTPException(404, "Meals not found")
             raise
 
         fp.seek(0)
@@ -27,6 +30,7 @@ def get_meals() -> List[Meal]:
 
 
 def save_meals(meals: List[Meal]):
+    """Saves meals in AWS."""
     menu_json = dumps(jsonable_encoder(meals))
     s3 = boto3.client("s3")
     with tempfile.TemporaryFile() as fp:
@@ -42,5 +46,6 @@ def save_meals(meals: List[Meal]):
 
 
 def create_bucket():
+    """Creates the AWS bucket."""
     s3 = boto3.client("s3")
     s3.create_bucket(Bucket=settings.S3_BUCKET_NAME)
