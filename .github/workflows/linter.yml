@@ -23,8 +23,8 @@ jobs:
       - name: Install
         run: poetry install
       - name: Lint with pylint
-        run: python -m pylint app
+        run: poetry run pylint app
       - name: Check imports
-        run: python -m isort --check app
+        run: poetry run isort --check app
       - name: Run black
-        run: python -m black --check app
+        run: poetry run black --check app
