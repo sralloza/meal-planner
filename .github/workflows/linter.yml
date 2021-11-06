@@ -1,9 +1,9 @@
-name: CI
+name: Linter
 # on: pull_request
 on: push
 
 jobs:
-  ci:
+  linter:
     strategy:
       fail-fast: false
       matrix:
@@ -23,4 +23,8 @@ jobs:
       - name: Install
         run: poetry install
       - name: Lint with pylint
-        run: pylint app
+        run: python -m pylint app
+      - name: Check imports
+        run: python -m isort --check app
+      - name: Run black
+        run: python -m black --check app
