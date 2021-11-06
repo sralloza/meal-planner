@@ -1,3 +1,5 @@
+"""Cron related API endpoints."""
+
 from enum import Enum
 
 from fastapi import APIRouter, BackgroundTasks, Depends
@@ -14,15 +16,16 @@ router = APIRouter(
 
 
 class ValidCron(Enum):
-    backup_database = "backup-database"
-    check_frozen_meals = "check-frozen-meals"
-    update_notion_meals = "update-notion-meals"
+    """Defined crons that can be launched from the API."""
+    BACKUP_DATABASE = "backup-database"
+    CHECK_FROZEN_MEALS = "check-frozen-meals"
+    UPDATE_NOTION_MEALS = "update-notion-meals"
 
 
 CRON_MAP = {
-    ValidCron.backup_database: backup_database,
-    ValidCron.check_frozen_meals: check_frozen_meals,
-    ValidCron.update_notion_meals: update_notion_meals,
+    ValidCron.BACKUP_DATABASE: backup_database,
+    ValidCron.CHECK_FROZEN_MEALS: check_frozen_meals,
+    ValidCron.UPDATE_NOTION_MEALS: update_notion_meals,
 }
 
 

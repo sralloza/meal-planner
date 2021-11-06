@@ -1,3 +1,5 @@
+"""Main app generation."""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette_prometheus import PrometheusMiddleware, metrics
@@ -14,6 +16,7 @@ from .utils.server import catch_errors
 
 
 def get_application():
+    """Creates and sets up the application."""
     _app = FastAPI(
         title="Meal Planner", docs_url=None, redoc_url="/docs", version=get_version()
     )

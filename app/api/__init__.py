@@ -1,3 +1,5 @@
+"""API module. Contains the API router."""
+
 from fastapi.routing import APIRouter
 
 from .cron import router as cron_router

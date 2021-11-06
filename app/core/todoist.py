@@ -1,9 +1,12 @@
+"""Todoist operations."""
+
 from todoist.api import TodoistAPI
 
 from .config import settings
 
 
 def add_task(msg: str, due: str = "today", priority: int = 1):
+    """Adds a todoist task."""
     api = TodoistAPI(settings.TODOIST_TOKEN)
     api.items.add(
         msg,

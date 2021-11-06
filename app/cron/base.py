@@ -1,6 +1,7 @@
+"""Apscheduler configuration."""
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# XXX: Consider using prod database instead of a disposable sqlite
 scheduler = BackgroundScheduler(
     {
         "apscheduler.jobstores.default": {

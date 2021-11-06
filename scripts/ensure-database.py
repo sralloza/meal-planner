@@ -1,3 +1,5 @@
+"""Script to ensure that the database exists."""
+
 import traceback
 
 import click
@@ -7,6 +9,7 @@ from app.db.session import engine
 
 
 def ensure_database() -> None:
+    """Creates the database if it doesn't exist."""
     try:
         if not database_exists(engine.url):
             create_database(engine.url)

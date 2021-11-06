@@ -1,3 +1,5 @@
+"""Base CRUD operations."""
+
 from typing import Any, Generic, List, Optional, Type, TypeVar
 
 from fastapi.exceptions import HTTPException
@@ -10,13 +12,17 @@ ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
+# pylint: disable=redefined-builtin
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
+    """Base CRUD class."""
     def raise_not_found_error(self, *, id: Any):
+        """Raise 404 NOT FOUND."""
         detail = f"{self.model.__name__} with id={id} does not exist"
         raise HTTPException(404, detail)
 
     def raise_conflict_error(self, id: Any):
+        """Raise 409 CONFLICT."""
         detail = f"{self.model.__name__} with id={id} already exists"
         raise HTTPException(409, detail)
 
@@ -30,22 +36,28 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
 
     def get(self, db: Session, id: Any) -> Optional[ModelType]:
+        """Get an object using its id."""
         return db.query(self.model).filter(self.model.id == id).first()
 
     def get_or_404(self, db: Session, id: Any) -> ModelType:
+        """Get an object or return 404."""
         obj = self.get(db, id=id)
         if obj is not None:
             return obj
-        self.raise_not_found_error(id=id)
+        return self.raise_not_found_error(id=id)
 
     def get_multi(
         self, db: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
+        """Get multiple objects."""
+
         return db.query(self.model).offset(skip).limit(limit).all()
 
     def create(
         self, db: Session, *, obj_in: CreateSchemaType, commit_refresh=True
     ) -> ModelType:
+        """Create an object."""
+
         obj_in_data = obj_in.dict()
         if "id" in obj_in_data and self.get(db, id=obj_in_data["id"]):
             self.raise_conflict_error(id=obj_in_data["id"])
@@ -64,6 +76,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj: ModelType,
         obj_in: UpdateSchemaType,
     ) -> ModelType:
+        """Update an object."""
 
         obj_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
@@ -75,6 +88,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def remove(self, db: Session, *, id: Any) -> None:
+        """Remove an object."""
         obj = self.get_or_404(db, id=id)
         db.delete(obj)
         db.commit()

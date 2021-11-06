@@ -1,3 +1,5 @@
+"""Meal schemas."""
+
 from datetime import date
 from typing import List, Optional
 

@@ -1,3 +1,5 @@
+"""Notion operations"""
+
 from typing import Dict, List
 
 import requests
@@ -6,6 +8,7 @@ from .config import settings
 
 
 def create_notion_block(content: str, bold=False, italics=False, code=False):
+    """Returns the json to create a notion block."""
     block = {
         "type": "text",
         "text": {"content": content},
@@ -24,6 +27,7 @@ def create_notion_block(content: str, bold=False, italics=False, code=False):
 
 
 def update_notion_text(blocks: List[Dict]):
+    """Updates the notion text via its API."""
     headers = {
         "Authorization": f"Bearer {settings.NOTION_KEY}",
         "Content-Type": "application/json",
