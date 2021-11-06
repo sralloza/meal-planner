@@ -7,8 +7,8 @@ from ..schemas.meal import Meal
 from .base import scheduler
 
 
-# Should fire everyday at 16:00
-@scheduler.scheduled_job("cron", id="check-frozen-meals", hour="16", minute="0")
+# Should fire everyday at 19:00
+@scheduler.scheduled_job("cron", id="check-frozen-meals", hour="19", minute="0")
 def check_frozen_meals():
     """Checks if tomorrow something frozen is on the menu."""
     with manual_db() as db:
@@ -23,4 +23,4 @@ def check_frozen_meals():
         return
 
     text = f"Descongelar: {', '.join(meal.frozen)}"
-    add_task(text, due="today 20:30", priority=4)
+    add_task(text, due="today 21:30", priority=4)
