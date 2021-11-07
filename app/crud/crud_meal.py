@@ -1,11 +1,12 @@
 """Meals CRUD operations."""
 
-from datetime import datetime, timedelta
+import datetime
 from typing import List
 
 from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
+from ..core.meals import SwapMode, swap_attrs
 from ..crud.base import CRUDBase
 from ..models import Meal
 from ..schemas.meal import MealCreate, MealUpdate
@@ -30,7 +31,7 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         """Get today's menu or return 404."""
         meal_db = self.get_today(db)
         if not meal_db:
-            self.raise_not_found_error(id=datetime.now().date())
+            self.raise_not_found_error(id=datetime.datetime.now().date())
         return meal_db
 
     def get_tomorrow_or_404(self, db: Session):
@@ -43,11 +44,11 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
     @staticmethod
     def get_tomorrow_date():
         """Returns tomorrow's date."""
-        return (datetime.now() + timedelta(days=1)).date()
+        return (datetime.datetime.now() + datetime.timedelta(days=1)).date()
 
     def get_by_date_delta(self, db: Session, *, delta_days: int):
         """Get menu using a relative time delta."""
-        date = (datetime.now() + timedelta(days=delta_days)).date()
+        date = (datetime.datetime.now() + datetime.timedelta(days=delta_days)).date()
         return self.get(db, id=date)
 
     def get_today(self, db: Session):
@@ -75,6 +76,48 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         """Get current week's menu."""
         week = get_current_week()
         return self.get_week(db, week=week)
+
+    def swap(
+        self,
+        db: Session,
+        *,
+        date_1: datetime.date,
+        date_2: datetime.date,
+        mode: SwapMode
+    ) -> List[Meal]:
+        """Swaps two meals data."""
+        obj1 = self.get_or_404(db, id=date_1)
+        obj2 = self.get_or_404(db, id=date_2)
+
+        attrnames = []
+        if mode == SwapMode.ALL:
+            attrnames += ["lunch1", "lunch2", "dinner"]
+        elif mode == SwapMode.LUNCH:
+            attrnames += ["lunch1", "lunch2"]
+        elif mode == SwapMode.LUNCH_1:
+            attrnames.append("lunch1")
+        elif mode == SwapMode.LUNCH_2:
+            attrnames.append("lunch2")
+        elif mode == SwapMode.DINNER:
+            attrnames.append("dinner")
+
+        if "lunch1" in attrnames:
+            attrnames.append("lunch1_frozen")
+        if "lunch2" in attrnames:
+            attrnames.append("lunch2_frozen")
+        if "dinner" in attrnames:
+            attrnames.append("dinner_frozen")
+
+        for attr in attrnames:
+            swap_attrs(obj1, obj2, attr)
+
+        db.add(obj1)
+        db.add(obj2)
+        db.commit()
+        db.refresh(obj1)
+        db.refresh(obj2)
+
+        return [obj1, obj2]
 
     def remove_week(self, db: Session, *, week: int):
         """Remove meals for the entire week."""
