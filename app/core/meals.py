@@ -13,8 +13,8 @@ class SwapMode(Enum):
 
     ALL = "all"
     LUNCH = "lunch"
-    LUNCH_1 = "lunch_1"
-    LUNCH_2 = "lunch_2"
+    LUNCH_1 = "lunch1"
+    LUNCH_2 = "lunch2"
     DINNER = "dinner"
 
 
