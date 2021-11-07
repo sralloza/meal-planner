@@ -2,6 +2,7 @@
 
 from .. import crud
 from ..core.config import settings
+from ..core.cron import get_weekday
 from ..core.notion import create_notion_block, update_notion_text
 from ..deps.database import manual_db
 from ..schemas.meal import Meal
@@ -22,16 +23,19 @@ def update_notion_meals():
     dat_meal = Meal.from_orm(dat_meal) if dat_meal else None
 
     blocks = []
-    blocks.append(create_notion_block("Hoy\n", bold=True))
+    weekday = get_weekday(0)
+    blocks.append(create_notion_block(f"Hoy ({weekday})\n", bold=True))
     if today_meal:
         blocks.extend(today_meal.to_notion_blocks())
 
-    blocks.append(create_notion_block("\nMañana\n", bold=True))
+    weekday = get_weekday(1)
+    blocks.append(create_notion_block(f"\nMañana ({weekday})\n", bold=True))
     if tomorrow_meal:
         blocks.extend(tomorrow_meal.to_notion_blocks())
 
     if settings.NOTION_ADD_DAY_AFTER_TOMORROW:
-        blocks.append(create_notion_block("\nPasado mañana\n", bold=True))
+        weekday = get_weekday(2)
+        blocks.append(create_notion_block(f"\nPasado mañana ({weekday})\n", bold=True))
         if dat_meal:
             blocks.extend(dat_meal.to_notion_blocks())
 

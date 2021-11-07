@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # Defined dinamically
     DATABASE_URI: str = ""
 
+    # Other
+    FORCE_LOCALE: str = ""
+
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
