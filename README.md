@@ -67,6 +67,10 @@ You need to supply the following environment variables (required ones are marked
 - 🚩 **MYSQL_PORT** (`str`): mysql port.
 - 🚩 **MYSQL_USER** (`str`): mysql user.
 
+### Other
+
+- **LOCALE_WEEKDAY_NAMES** (`list(str)`): weekday names, starting with Sunday and ending with Saturday. Must contain 7 elements (one for each week day).
+
 ## Future
 
 AWS and notion settings are currently needed. If you want to use this app without one of them (or both) add an issue and I'll make it optional and configurable.
