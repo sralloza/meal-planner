@@ -1,12 +1,23 @@
 """Update notion meals cron sript."""
 
+import locale
+from datetime import datetime, timedelta
+
 from .. import crud
 from ..core.config import settings
-from ..core.cron import get_weekday
 from ..core.notion import create_notion_block, update_notion_text
 from ..deps.database import manual_db
 from ..schemas.meal import Meal
 from .base import scheduler
+
+
+def get_weekday(delta_days: int = 0) -> str:
+    """Return the weekday in words given a delta in days."""
+    if settings.FORCE_LOCALE:
+        locale.setlocale(locale.LC_TIME, settings.FORCE_LOCALE)
+
+    date = datetime.now() + timedelta(days=delta_days)
+    return date.strftime("%A")
 
 
 # Should fire everyday at 05:00
