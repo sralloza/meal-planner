@@ -29,10 +29,10 @@ jobs:
         run: poetry install
 
       - name: Run black
-        run: poetry run black --check app
+        run: poetry run black --check .
 
       - name: Check imports
-        run: poetry run isort --check app
+        run: poetry run isort --check .
 
       - name: Lint with pylint
         run: poetry run pylint app
