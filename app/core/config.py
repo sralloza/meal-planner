@@ -1,8 +1,16 @@
 """Config module."""
 
-from typing import Any, Dict, Optional
+import json
+from typing import Any, Dict, List, Optional
 
 from pydantic import UUID4, BaseSettings, validator
+
+
+def list_parse_fallback(v):
+    try:
+        return json.loads(v)
+    except json.JSONDecodeError:
+        return v.split(",")
 
 
 class Settings(BaseSettings):
@@ -37,7 +45,7 @@ class Settings(BaseSettings):
     DATABASE_URI: str = ""
 
     # Other
-    FORCE_LOCALE: str = ""
+    LOCALE_WEEKDAY_NAMES: Optional[List[str]]
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
@@ -49,9 +57,17 @@ class Settings(BaseSettings):
             f"{values.get('MYSQL_PORT')}/{values.get('MYSQL_DATABASE')}"
         )
 
+    @validator("LOCALE_WEEKDAY_NAMES")
+    def check_locale_names(cls, v):
+        if isinstance(v, list):
+            if len(v) != 7:
+                raise ValueError("must have 7 elements (one for each week day)")
+        return v
+
     class Config:
         case_sensitive = True
         env_file = ".env"
+        json_loads = list_parse_fallback
 
 
 settings = Settings()

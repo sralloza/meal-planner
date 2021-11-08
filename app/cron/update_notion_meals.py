@@ -1,6 +1,5 @@
 """Update notion meals cron sript."""
 
-import locale
 from datetime import datetime, timedelta
 
 from .. import crud
@@ -13,10 +12,11 @@ from .base import scheduler
 
 def get_weekday(delta_days: int = 0) -> str:
     """Return the weekday in words given a delta in days."""
-    if settings.FORCE_LOCALE:
-        locale.setlocale(locale.LC_TIME, settings.FORCE_LOCALE)
-
     date = datetime.now() + timedelta(days=delta_days)
+
+    if settings.LOCALE_WEEKDAY_NAMES:
+        return settings.LOCALE_WEEKDAY_NAMES[int(date.strftime("%w"))]
+
     return date.strftime("%A")
 
 
