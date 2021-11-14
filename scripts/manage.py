@@ -65,6 +65,15 @@ def convert_md_to_yml(date: str):
 
         dinner = parsed["dinner"].strip("- ")
         obj = dict(date=meal_date, lunch1=lunch1, lunch2=lunch2, dinner=dinner)
+        if "[C]" in lunch1:
+            obj["lunch1_frozen"] = True
+            obj["lunch1"] = obj["lunch1"].replace("[C] ", "")
+        if lunch2 and "[C]" in lunch2:
+            obj["lunch2_frozen"] = True
+            obj["lunch2"] = obj["lunch2"].replace("[C] ", "")
+        if "[C]" in dinner:
+            obj["dinner_frozen"] = True
+            obj["dinner"] = obj["dinner"].replace("[C] ", "")
         objs.append(obj)
 
     yaml_path = MD_DIR / f"{date}.yml"
