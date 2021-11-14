@@ -47,7 +47,9 @@ def update_notion_meals():
     if settings.NOTION_ADD_DAY_AFTER_TOMORROW:
         weekday = get_weekday(2)
         if dat_meal:
-            blocks.append(create_notion_block(f"\nPasado mañana ({weekday})\n", bold=True))
+            blocks.append(
+                create_notion_block(f"\nPasado mañana ({weekday})\n", bold=True)
+            )
             blocks.extend(dat_meal.to_notion_blocks())
 
     if len(blocks) <= 3:
