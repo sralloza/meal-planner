@@ -155,11 +155,17 @@ def create_multiple_meals(
     summary="Swap meals",
 )
 def swap_meals(
-    *, db=Depends(get_db), meal_1: datetime.date, meal_2: datetime.date, mode: SwapMode
+    *,
+    db=Depends(get_db),
+    meal_1: datetime.date,
+    meal_2: datetime.date,
+    mode: SwapMode,
+    background_tasks: BackgroundTasks,
 ):
     """Swaps meal attributes."""
-
-    return crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode)
+    result = crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode)
+    background_tasks.add_task(update_notion_meals)
+    return result
 
 
 @router.put(
