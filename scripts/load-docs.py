@@ -1,5 +1,6 @@
 """Load docs script."""
 
+from datetime import datetime
 import locale
 from itertools import groupby
 from pathlib import Path
@@ -11,6 +12,7 @@ from ruamel.yaml import YAML
 
 from app import crud
 from app.core.aws import get_meals
+from app.core.config import settings
 from app.deps.database import manual_db
 from app.schemas.meal import Meal
 
@@ -23,7 +25,8 @@ yml.indent(offset=2, sequence=4)
 
 @click.command()
 @click.argument("source", type=click.Choice(["aws", "db"]))
-def load_docs(source: str):
+@click.option("--extra-week", is_flag=True)
+def load_docs(source: str, extra_week: bool):
     """Load the docs from AWS or the database."""
     if source == "aws":
         meals = get_meals()
@@ -32,15 +35,36 @@ def load_docs(source: str):
             meals = parse_obj_as(List[Meal], crud.meal.get_multi(db))
 
     weeks = []
+    week = 0
     for week, weekly_meals in groupby(meals, lambda x: x.id.isocalendar()[1]):
         weeks.append(week)
         weekly_meals = list(weekly_meals)
         create_md(week, weekly_meals)
 
+    if extra_week and week:
+        weeks.append(week + 1)
+        create_md(week + 1, [], override=False)
+
+    recreate_md_index(weeks)
     rebuild_mkdocs_yml(weeks)
 
 
-def create_md(week: int, weekly_meals: List[Meal]):
+def get_weekdays():
+    return [datetime(2001, 1, i).strftime("%A") for i in range(1, 8)]
+
+
+def get_default_md_text():
+    output = "# Semana XXXX-XX-XX\n"
+
+    weekdays = settings.LOCALE_WEEKDAY_NAMES or get_weekdays()
+
+    for weekday in weekdays:
+        output += f"\n## {weekday.title()}\n"
+
+    return output
+
+
+def create_md(week: int, weekly_meals: List[Meal], override=True):
     """Creates the markdown file."""
     MD_DIR.mkdir(exist_ok=True)
     md_filepath = MD_DIR / f"{week}.md"
@@ -57,7 +81,26 @@ def create_md(week: int, weekly_meals: List[Meal]):
             content += f"- {meal.lunch2}\n"
         content += f"\n- {meal.dinner}\n"
 
+    if not content:
+        content = get_default_md_text()
+
+    if md_filepath.exists() and not override:
+        data = md_filepath.read_text("utf8")
+        if content != data:
+            click.secho(f"Skipping write of {md_filepath} (override=False)", fg="bright_yellow")
+            return
+
+
     md_filepath.write_text(content, "utf8")
+
+
+def recreate_md_index(weeks: List[int]):
+    index_path = MKDOCS_YML_PATH.parent / "docs/index.md"
+    output = "# Meal Planner - Planificador de comidas\n\n"
+    for week in weeks:
+        output += f"- [Semana {week}]({week}.md)\n"
+
+    index_path.write_text(output, "utf8")
 
 
 def rebuild_mkdocs_yml(weeks: List[int]):
