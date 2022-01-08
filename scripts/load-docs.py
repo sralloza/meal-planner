@@ -12,6 +12,7 @@ import requests
 from dateutil.relativedelta import relativedelta
 from pydantic.tools import parse_obj_as
 from ruamel.yaml import YAML
+from ruamel.yaml.main import add_constructor
 
 from app import crud
 from app.core.aws import get_meals
@@ -51,8 +52,11 @@ def load_docs(source: str, extra_week: bool):
         create_md(week, weekly_meals)
 
     if extra_week and week:
-        weeks.append(week + 1)
-        create_md(week + 1, [], override=False)
+        current_week = datetime.now().isocalendar().week
+        next_week = current_week + 1 if current_week != 52 else 1
+
+        weeks.append(next_week)
+        create_md(next_week, [], override=False)
 
     recreate_md_index(weeks)
     rebuild_mkdocs_yml(weeks)
