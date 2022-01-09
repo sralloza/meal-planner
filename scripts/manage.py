@@ -113,7 +113,7 @@ def convert_yml_json(date: str):
             return
 
         click.confirm(
-            "YML file exists and will be modified. Continue?", abort=True, default=True
+            "JSON file exists and will be modified. Continue?", abort=True, default=True
         )
 
     with json_path.open("wt", encoding="utf8") as fh:
