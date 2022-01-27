@@ -66,6 +66,7 @@ You need to supply the following environment variables (required ones are marked
 - 🚩 **MYSQL_PASSWORD** (`str`): mysql password.
 - 🚩 **MYSQL_PORT** (`str`): mysql port.
 - 🚩 **MYSQL_USER** (`str`): mysql user.
+- **WAIT_FOR_IT_ADDRESS** (`str`): if is set, it will wait for the database to be ready for max 30 seconds. Must be set to `$MYSQL_HOST:$MYSQL_PORT`. This switch should not be used in Kubernetes deployments, as initContainers are designed to cover this exact use case.
 
 ### Other
 
