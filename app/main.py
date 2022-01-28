@@ -40,11 +40,18 @@ def get_application():
         create_db_and_tables()
 
         if not settings.PRODUCTION:
-            print("Warning: development env, skipping cronjobs")
+            print(
+                "Warning: development env, skipping "
+                "cronjobs and initial notion update"
+            )
             return
 
-        scheduler.print_jobs()
-        scheduler.start()
+        if settings.DISABLE_CRON_INTEGRATION:
+            print("Cron integration is disabled")
+        else:
+            scheduler.print_jobs()
+            scheduler.start()
+
         update_notion_meals()
 
     return _app

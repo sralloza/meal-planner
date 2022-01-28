@@ -40,6 +40,7 @@ You need to supply the following environment variables (required ones are marked
 - 🚩 **API_TOKEN** (`str`): token of the API. In order to use the API, users will have to provide this token in their requests via the `X-TOKEN` header.
 - **ENABLE_PROMETHEUS** (`bool`): if `True`, the API will enable the prometheus endpoint `/metrics`. Defaults to `False`.
 - **PRODUCTION** (`bool`): if `True` the server will run on production environment. Defaults to `False`.
+- **DISABLE_CRON_INTEGRATION** (`bool`) if `True`, the server will not launch cron jobs. It is useful to launch replicas, enabling cron integration in only one of them. It is also useful to deploy on Kubernetes, as the cron jobs can be implemented via `CronJob`.
 
 ### AWS
 
@@ -66,7 +67,7 @@ You need to supply the following environment variables (required ones are marked
 - 🚩 **MYSQL_PASSWORD** (`str`): mysql password.
 - 🚩 **MYSQL_PORT** (`str`): mysql port.
 - 🚩 **MYSQL_USER** (`str`): mysql user.
-- **WAIT_FOR_IT_ADDRESS** (`str`): if is set, it will wait for the database to be ready for max 120 seconds. Must be set to `$MYSQL_HOST:$MYSQL_PORT`. This switch should not be used in Kubernetes deployments, as initContainers are designed to cover this exact use case.
+- **WAIT_FOR_IT_ADDRESS** (`str`): if is set, it will wait for the database to be ready for max 120 seconds. Must be set to `$MYSQL_HOST:$MYSQL_PORT`. This switch should not be used in Kubernetes deployments, as `initContainers` are designed to cover this exact use case.
 
 ### Other
 
