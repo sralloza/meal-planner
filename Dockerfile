@@ -11,7 +11,7 @@ EXPOSE ${PORT}
 
 RUN apk update && \
     apk upgrade && \
-    apk add curl gcc musl-dev build-base
+    apk add curl gcc musl-dev build-base bash
 
 # Install Poetry
 RUN curl -sSL ${GET_POETRY} | POETRY_HOME=/opt/poetry python && \
