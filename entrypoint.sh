@@ -8,8 +8,11 @@ else
   /wait-for-it.sh -t 120 "${WAIT_FOR_IT_ADDRESS}"
 fi
 
+echo "Ensuring database existence"
 python ./scripts/ensure-database.py
 
+echo "Upgrading database"
 alembic upgrade head
 
+echo "Launching uvicorn server"
 exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
