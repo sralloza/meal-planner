@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     API_TOKEN: str
     ENABLE_PROMETHEUS: bool = False
     PRODUCTION: bool = False
+    DISABLE_CRON_INTEGRATION: bool = False
 
     # AWS
     AWS_ACCESS_KEY_ID: str
