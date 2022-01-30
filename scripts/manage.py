@@ -20,7 +20,7 @@ from app.schemas.meal import Meal
 
 PATTERN = r"## (?P<weekday>[\wáéó]+)\n(?P<lunch>[\[\]\-\/()\wáéó\n ]+)\n(?P<dinner>[\[\]\-\/()\wáéó\n ]+)\n"
 MD_DIR = Path(__file__).parent.parent / "docs"
-MD_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".md"]
+MD_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".md" and x.stem.isdigit()]
 YML_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".yml"]
 JSON_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".json"]
 
@@ -95,8 +95,16 @@ def convert_md_to_yml(date: str):
     yaml_path.write_text(re.sub("(- date:)", r"\n\1", unparsed_data), encoding="utf8")
 
 
-@cli.command("yml-json")
+@cli.command("confirm")
 @click.argument("date", metavar="DATE", type=click.Choice(YML_FILES))
+@click.option("--dry-run", "-n", is_flag=True, help="Dry run mode")
+@click.argument("API_URL", envvar="MEAL_PLANNER_API_URL", required=False)
+def upload_yml(date: str, api_url: str, dry_run: bool):
+    convert_yml_json(date)
+    if not dry_run:
+        upload_json(date, api_url)
+
+
 def convert_yml_json(date: str):
     filepath = MD_DIR / f"{date}.yml"
     with filepath.open("rt", encoding="utf8") as fh:
@@ -113,16 +121,13 @@ def convert_yml_json(date: str):
             return
 
         click.confirm(
-            "YML file exists and will be modified. Continue?", abort=True, default=True
+            "JSON file exists and will be modified. Continue?", abort=True, default=True
         )
 
     with json_path.open("wt", encoding="utf8") as fh:
         json.dump(jsonable_encoder(parsed_data), fh, indent=2, ensure_ascii=False)
 
 
-@cli.command("upload-json")
-@click.argument("date", metavar="DATE", type=click.Choice(JSON_FILES))
-@click.argument("API_URL", envvar="MEAL_PLANNER_API_URL")
 def upload_json(date: str, api_url: str):
     filepath = MD_DIR / f"{date}.json"
     headers = {"x-token": settings.API_TOKEN, "user-agent": "mealer"}
