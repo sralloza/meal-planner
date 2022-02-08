@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  api:
+  app:
     build: .
     env_file:
       - .env
@@ -11,6 +11,7 @@ services:
       - MYSQL_HOST=database
       - MYSQL_PORT=3306
       - MYSQL_DATABASE=meal-planner
+      - WAIT_FOR_IT_ADDRESS=database:3306
 
       # If you don't have this environment variables in your
       # terminal, put them in the .env file
