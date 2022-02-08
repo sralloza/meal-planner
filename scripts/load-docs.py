@@ -12,7 +12,6 @@ import requests
 from dateutil.relativedelta import relativedelta
 from pydantic.tools import parse_obj_as
 from ruamel.yaml import YAML
-from ruamel.yaml.main import add_constructor
 
 from app import crud
 from app.core.aws import get_meals
@@ -26,6 +25,7 @@ ORIGINAL_MKDOCS_URL = (
 MD_DIR = Path(__file__).parent.with_name("docs")
 MKDOCS_YML_PATH = Path(__file__).parent.parent / "mkdocs.yml"
 locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+
 yml = YAML()
 yml.indent(offset=2, sequence=4)
 
@@ -72,9 +72,9 @@ def filter_meals(meals: List[Meal]) -> List[Meal]:
     week_0 = week_0 + 1 if week_0 != 52 else 1
 
     if week_0 > week_1:
-        valid_weeks = tuple(range(week_0, 53)) + tuple(range(1, week_1 + 1))
+        valid_weeks = tuple(range(week_0, 53)) + tuple(range(1, week_1 + 3))
     else:
-        valid_weeks = tuple(range(week_0, week_1 + 1))
+        valid_weeks = tuple(range(week_0, week_1 + 3))
 
     return [x for x in meals if x.id.isocalendar().week in valid_weeks]
 

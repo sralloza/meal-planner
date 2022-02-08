@@ -1,6 +1,7 @@
 """Base CRUD operations."""
 
-from typing import Any, Generic, List, Optional, Type, TypeVar
+from datetime import date
+from typing import Generic, List, Optional, Type, TypeVar
 
 from fastapi.exceptions import HTTPException
 from pydantic import BaseModel
@@ -12,18 +13,19 @@ ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
+_Id = date
 # pylint: disable=redefined-builtin
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     """Base CRUD class."""
 
-    def raise_not_found_error(self, *, id: Any):
+    def raise_not_found_error(self, *, id: _Id):
         """Raise 404 NOT FOUND."""
         detail = f"{self.model.__name__} with id={id} does not exist"
         raise HTTPException(404, detail)
 
-    def raise_conflict_error(self, id: Any):
+    def raise_conflict_error(self, id: _Id):
         """Raise 409 CONFLICT."""
         detail = f"{self.model.__name__} with id={id} already exists"
         raise HTTPException(409, detail)
@@ -37,11 +39,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get(self, db: Session, id: Any) -> Optional[ModelType]:
+    def get(self, db: Session, id: _Id) -> Optional[ModelType]:
         """Get an object using its id."""
         return db.query(self.model).filter(self.model.id == id).first()
 
-    def get_or_404(self, db: Session, id: Any) -> ModelType:
+    def get_or_404(self, db: Session, id: _Id) -> ModelType:
         """Get an object or return 404."""
         obj = self.get(db, id=id)
         if obj is not None:
@@ -89,7 +91,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: Any) -> None:
+    def remove(self, db: Session, *, id: _Id) -> None:
         """Remove an object."""
         obj = self.get_or_404(db, id=id)
         db.delete(obj)

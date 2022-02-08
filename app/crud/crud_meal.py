@@ -38,7 +38,7 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         """Get tomorrow's menu or return 404."""
         meal_db = self.get_tomorrow(db)
         if not meal_db:
-            self.raise_not_found_error(id=self.get_tomorrow_date)
+            self.raise_not_found_error(id=self.get_tomorrow_date())
         return meal_db
 
     @staticmethod
