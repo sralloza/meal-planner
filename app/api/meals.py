@@ -160,10 +160,31 @@ def swap_meals(
     meal_1: datetime.date,
     meal_2: datetime.date,
     mode: SwapMode,
+    simple=Depends(simplify_asked),
     background_tasks: BackgroundTasks,
 ):
     """Swaps meal attributes."""
-    result = crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode)
+    result = simplify(
+        crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode),
+        List[SimpleMeal],
+        simple,
+    )
+    background_tasks.add_task(update_notion_meals)
+    return result
+
+
+@router.put(
+    "/shift/{date}", response_model=List[Union[Meal, SimpleMeal]], summary="Shift meals"
+)
+def shift_meals(
+    *,
+    db=Depends(get_db),
+    date: datetime.date,
+    mode: SwapMode,
+    background_tasks: BackgroundTasks,
+):
+    """Shifts meals X days to the future."""
+    result = crud.meal.shift(db, date=date, mode=mode)
     background_tasks.add_task(update_notion_meals)
     return result
 

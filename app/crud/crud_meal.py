@@ -6,11 +6,21 @@ from typing import List
 from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
-from ..core.meals import SwapMode, swap_attrs
+from ..core.config import settings
+from ..core.meals import SwapMode, set_attrs, swap_attrs
 from ..crud.base import CRUDBase
 from ..models import Meal
 from ..schemas.meal import MealCreate, MealUpdate
 from ..utils.misc import get_current_week
+
+NULL_MAP = {
+    "lunch1": settings.NULL_STR,
+    "lunch1_frozen": False,
+    "lunch2": None,
+    "lunch2_frozen": False,
+    "dinner": settings.NULL_STR,
+    "dinner_frozen": False,
+}
 
 
 class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
@@ -83,12 +93,26 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         *,
         date_1: datetime.date,
         date_2: datetime.date,
-        mode: SwapMode
+        mode: SwapMode,
     ) -> List[Meal]:
         """Swaps two meals data."""
         obj1 = self.get_or_404(db, id=date_1)
         obj2 = self.get_or_404(db, id=date_2)
 
+        attrnames = self.get_attrnames_from_swapmode(mode)
+        for attr in attrnames:
+            swap_attrs(obj1, obj2, attr)
+
+        db.add(obj1)
+        db.add(obj2)
+        db.commit()
+        db.refresh(obj1)
+        db.refresh(obj2)
+
+        return [obj1, obj2]
+
+    @staticmethod
+    def get_attrnames_from_swapmode(mode: SwapMode):
         attrnames = []
         if mode == SwapMode.ALL:
             attrnames += ["lunch1", "lunch2", "dinner"]
@@ -108,16 +132,51 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         if "dinner" in attrnames:
             attrnames.append("dinner_frozen")
 
+        return attrnames
+
+    def shift(self, db: Session, *, date: datetime.date, mode: SwapMode):
+        """Shifts all meals x days to the future."""
+        meal = self.get(db, id=date)
+        # If there is no meal for that date we don't have to do anything
+        if meal is None:
+            return []
+
+        attrnames = self.get_attrnames_from_swapmode(mode)
+        meals = self.get_days_to_shift(db, meal, attrnames)
+
+        for m in meals:
+            db.refresh(m)
+
+        # Shift all meals
+        meals.sort(key=lambda x: x.id, reverse=True)
+        for idx, meal in enumerate(meals):
+            if idx:
+                set_attrs(meals[idx], meals[idx - 1], attrnames)
+
+        # Remove attributes from first meal
         for attr in attrnames:
-            swap_attrs(obj1, obj2, attr)
+            setattr(meal, attr, NULL_MAP[attr])
 
-        db.add(obj1)
-        db.add(obj2)
+        db.add_all(meals)
         db.commit()
-        db.refresh(obj1)
-        db.refresh(obj2)
 
-        return [obj1, obj2]
+        meals.sort(key=lambda x: x.id)
+        return meals
+
+    def get_days_to_shift(
+        self, db: Session, first_meal: Meal, attrnames: List[str]
+    ) -> List[Meal]:
+        """Returns a list of meals to edit after shifting."""
+        next_day_id = first_meal.id + datetime.timedelta(days=1)
+        next_day_meal = self.get(db, id=next_day_id)
+        if next_day_meal is None:
+            new_meal = MealCreate(
+                date=next_day_id, lunch1=settings.NULL_STR, dinner=settings.NULL_STR
+            )
+            next_day_meal = self.create(db, obj_in=new_meal)
+            return [first_meal, next_day_meal]
+
+        return self.get_days_to_shift(db, next_day_meal, attrnames) + [first_meal]
 
     def remove_week(self, db: Session, *, week: int):
         """Remove meals for the entire week."""
