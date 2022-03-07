@@ -112,7 +112,8 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         return [obj1, obj2]
 
     @staticmethod
-    def get_attrnames_from_swapmode(mode: SwapMode):
+    def get_attrnames_from_swapmode(mode: SwapMode) -> List[str]:
+        """Returns the attributes that must be edited for each SwapMode."""
         attrnames = []
         if mode == SwapMode.ALL:
             attrnames += ["lunch1", "lunch2", "dinner"]
@@ -136,32 +137,32 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
 
     def shift(self, db: Session, *, date: datetime.date, mode: SwapMode):
         """Shifts all meals x days to the future."""
-        meal = self.get(db, id=date)
+        meal_to_move = self.get(db, id=date)
         # If there is no meal for that date we don't have to do anything
-        if meal is None:
+        if meal_to_move is None:
             return []
 
         attrnames = self.get_attrnames_from_swapmode(mode)
-        meals = self.get_days_to_shift(db, meal, attrnames)
+        meals_to_edit = self.get_days_to_shift(db, meal_to_move, attrnames)
 
-        for m in meals:
-            db.refresh(m)
+        for meal_to_edit in meals_to_edit:
+            db.refresh(meal_to_edit)
 
         # Shift all meals
-        meals.sort(key=lambda x: x.id, reverse=True)
-        for idx, meal in enumerate(meals):
+        meals_to_edit.sort(key=lambda x: x.id, reverse=True)
+        for idx, meal_to_move in enumerate(meals_to_edit):
             if idx:
-                set_attrs(meals[idx], meals[idx - 1], attrnames)
+                set_attrs(meals_to_edit[idx], meals_to_edit[idx - 1], attrnames)
 
         # Remove attributes from first meal
         for attr in attrnames:
-            setattr(meal, attr, NULL_MAP[attr])
+            setattr(meal_to_move, attr, NULL_MAP[attr])
 
-        db.add_all(meals)
+        db.add_all(meals_to_edit)
         db.commit()
 
-        meals.sort(key=lambda x: x.id)
-        return meals
+        meals_to_edit.sort(key=lambda x: x.id)
+        return meals_to_edit
 
     def get_days_to_shift(
         self, db: Session, first_meal: Meal, attrnames: List[str]
