@@ -24,6 +24,10 @@ def get_weekday(delta_days: int = 0) -> str:
 @scheduler.scheduled_job("cron", id="update-notion-meals", hour="5", minute="0")
 def update_notion_meals():
     """Update meals in notion page."""
+    if not settings.PRODUCTION:
+        print("Skipping update-cron-meals (dev)")
+        return
+
     with manual_db() as db:
         today_meal = crud.meal.get_today(db)
         tomorrow_meal = crud.meal.get_tomorrow(db)
