@@ -20,11 +20,14 @@ router = APIRouter(
     **gen_responses({401: "Missing Token", 403: "Invalid token"}),
 )
 
+_CustomMeal = Union[Meal, SimpleMeal]
+_CustomMealList = List[_CustomMeal]
+
 
 @router.get(
     "",
     response_model_exclude_unset=True,
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     summary="Get all meals",
 )
 def get_meals(
@@ -37,7 +40,7 @@ def get_meals(
 @router.get(
     "/week/current",
     response_model_exclude_unset=True,
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     summary="Get meals of current week",
 )
 def get_meals_of_current_week(*, db=Depends(get_db), simple=Depends(simplify_asked)):
@@ -48,7 +51,7 @@ def get_meals_of_current_week(*, db=Depends(get_db), simple=Depends(simplify_ask
 @router.get(
     "/week/next",
     response_model_exclude_unset=True,
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     summary="Get meals of next week",
 )
 def get_meals_of_next_week(*, db=Depends(get_db), simple=Depends(simplify_asked)):
@@ -61,7 +64,7 @@ def get_meals_of_next_week(*, db=Depends(get_db), simple=Depends(simplify_asked)
 @router.get(
     "/week/{week}",
     response_model_exclude_unset=True,
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     summary="Get meals of week",
 )
 def get_meals_of_week(*, week: int, db=Depends(get_db), simple=Depends(simplify_asked)):
@@ -72,7 +75,7 @@ def get_meals_of_week(*, week: int, db=Depends(get_db), simple=Depends(simplify_
 @router.get(
     "/today",
     response_model_exclude_unset=True,
-    response_model=Union[Meal, SimpleMeal],
+    response_model=_CustomMeal,
     summary="Get today meals",
 )
 def get_today_meals(*, db=Depends(get_db), simple=Depends(simplify_asked)):
@@ -83,7 +86,7 @@ def get_today_meals(*, db=Depends(get_db), simple=Depends(simplify_asked)):
 @router.get(
     "/tomorrow",
     response_model_exclude_unset=True,
-    response_model=Union[Meal, SimpleMeal],
+    response_model=_CustomMeal,
     summary="Get tomorrow meals",
 )
 def get_tomorrow_meals(*, db=Depends(get_db), simple=Depends(simplify_asked)):
@@ -94,7 +97,7 @@ def get_tomorrow_meals(*, db=Depends(get_db), simple=Depends(simplify_asked)):
 @router.get(
     "/{date}",
     response_model_exclude_unset=True,
-    response_model=Union[Meal, SimpleMeal],
+    response_model=_CustomMeal,
     summary="Get meal by its date",
     **gen_responses({404: "Not Found"}),
 )
@@ -107,7 +110,7 @@ def get_single_meal(
 
 @router.post(
     "",
-    response_model=Union[Meal, SimpleMeal],
+    response_model=_CustomMeal,
     status_code=201,
     summary="Create single meal",
     **gen_responses({409: "Date conflict"}),
@@ -128,7 +131,7 @@ def create_single_meal(
 @router.post(
     "/bulk",
     response_model_exclude_unset=True,
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     status_code=201,
     summary="Create multiple meals",
     **gen_responses({409: "Date conflict"}),
@@ -150,7 +153,7 @@ def create_multiple_meals(
 
 @router.put(
     "/swap",
-    response_model=List[Union[Meal, SimpleMeal]],
+    response_model=_CustomMealList,
     response_model_exclude_unset=True,
     summary="Swap meals",
 )
@@ -160,17 +163,44 @@ def swap_meals(
     meal_1: datetime.date,
     meal_2: datetime.date,
     mode: SwapMode,
+    simple=Depends(simplify_asked),
     background_tasks: BackgroundTasks,
 ):
     """Swaps meal attributes."""
-    result = crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode)
+    result = simplify(
+        crud.meal.swap(db, date_1=meal_1, date_2=meal_2, mode=mode),
+        List[SimpleMeal],
+        simple,
+    )
+    background_tasks.add_task(update_notion_meals)
+    return result
+
+
+@router.put(
+    "/shift/{date}",
+    response_model=_CustomMealList,
+    response_model_exclude_unset=True,
+    summary="Shift meals",
+)
+def shift_meals(
+    *,
+    db=Depends(get_db),
+    date: datetime.date,
+    mode: SwapMode,
+    simple=Depends(simplify_asked),
+    background_tasks: BackgroundTasks,
+):
+    """Shifts meals X days to the future."""
+    result = simplify(
+        crud.meal.shift(db, date=date, mode=mode), List[SimpleMeal], simple
+    )
     background_tasks.add_task(update_notion_meals)
     return result
 
 
 @router.put(
     "/{date}",
-    response_model=Union[Meal, SimpleMeal],
+    response_model=_CustomMeal,
     response_model_exclude_unset=True,
     summary="Update meal",
     **gen_responses({404: "Not Found"}),
