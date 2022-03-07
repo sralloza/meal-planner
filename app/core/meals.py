@@ -2,7 +2,7 @@
 
 
 from enum import Enum
-from typing import Any
+from typing import Any, List
 
 from fastapi import Query
 from pydantic import parse_obj_as
@@ -48,3 +48,8 @@ def swap_attrs(obj1: Any, obj2: Any, attrname: str):
 
     setattr(obj1, attrname, attr2)
     setattr(obj2, attrname, attr1)
+
+
+def set_attrs(old: Any, new: Any, attrnames: List[str]):
+    for attr in attrnames:
+        setattr(new, attr, getattr(old, attr))
