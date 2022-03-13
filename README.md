@@ -68,6 +68,7 @@ You need to supply the following environment variables (required ones are marked
 
 - **LOCALE_WEEKDAY_NAMES** (`list(str)`): weekday names, starting with Monday and ending with Sunday. Must contain 7 elements (one for each week day).
 - **NULL_STR** (`str`): string to represent an empty `lunch1` or `dinner`. Defaults to `N/A`.
+- **VARIABLE_STR** (`str`): string to represent a variable meal. Defaults to `Variable`. It's used in the `/shift` endpoint, where all meals which are equal to `VARIABLE_STR` will be treated as empty meals.
 
 ## Future
 

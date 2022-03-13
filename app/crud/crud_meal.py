@@ -11,7 +11,7 @@ from ..core.meals import SwapMode, set_attrs, swap_attrs
 from ..crud.base import CRUDBase
 from ..models import Meal
 from ..schemas.meal import MealCreate, MealUpdate
-from ..utils.misc import get_current_week
+from ..utils.misc import get_current_week, lowercase
 
 NULL_MAP = {
     "lunch1": settings.NULL_STR,
@@ -171,8 +171,14 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         attrnames are considered null.
         """
 
-        for attr in attrnames:
-            if getattr(meal, attr) != NULL_MAP[attr]:
+        var_str = lowercase(settings.VARIABLE_STR)
+
+        for attrname in attrnames:
+            attr = lowercase(getattr(meal, attrname))
+            null_str = lowercase(NULL_MAP[attrname])
+            null_str = null_str.lower() if isinstance(null_str, str) else null_str
+
+            if attr not in (null_str, var_str):
                 return False
         return True
 
