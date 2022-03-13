@@ -18,11 +18,6 @@ Features:
 
 Deployment is done via docker.
 
-Notes:
-
-- Remember you can use the tag you like.
-- The Dockerfile is designed to work on ARM systems, like a Raspberry Pi.
-
 ```shell
 # Build and push it to dockerhub
 docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --push .
@@ -31,36 +26,36 @@ docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,li
 docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --load .
 ```
 
-## Environment
+### Environment
 
 You need to supply the following environment variables (required ones are marked with 🚩). Settings are grouped in categories.
 
-### Server
+#### Server
 
 - 🚩 **API_TOKEN** (`str`): token of the API. In order to use the API, users will have to provide this token in their requests via the `X-TOKEN` header.
 - **ENABLE_PROMETHEUS** (`bool`): if `True`, the API will enable the prometheus endpoint `/metrics`. Defaults to `False`.
 - **PRODUCTION** (`bool`): if `True` the server will run on production environment. Defaults to `False`.
 - **DISABLE_CRON_INTEGRATION** (`bool`) if `True`, the server will not launch cron jobs. It is useful to launch replicas, enabling cron integration in only one of them. It is also useful to deploy on Kubernetes, as the cron jobs can be implemented via `CronJob`.
 
-### AWS
+#### AWS
 
 - 🚩 **AWS_ACCESS_KEY_ID** (`str`): AWS access key id.
 - 🚩 **AWS_SECRET_ACCESS_KEY** (`str`): AWS secret access key.
 - 🚩 **S3_BUCKET_NAME** (`str`): name of the S3 bucket to save the backups.
 - **S3_FILE_NAME** (`str`): filename to save the backups in the AWS S3 Bucket. Defaults to `meals.json`.
 
-### Notion
+#### Notion
 
 - **NOTION_ADD_DAY_AFTER_TOMORROW** (`bool`): if `True`, the meals of the day after tomorrow will also be added to Notion. Defaults to `True`.
 - 🚩 **NOTION_BLOCK_ID** (`uuid`): id of the notion block where the meals will be showed.
 - 🚩 **NOTION_KEY** (`str`): notion key to use the notion API.
 
-### Todoist
+#### Todoist
 
 - 🚩 **TODOIST_PROJECT_ID** (`int`): todoist project id where the tasks will be added.
 - 🚩 **TODOIST_TOKEN** (`str`): todoist token to use the todoist API.
 
-### Database
+#### Database
 
 - 🚩 **MYSQL_DATABASE** (`str`): database name.
 - 🚩 **MYSQL_HOST** (`str`): mysql host.
@@ -69,7 +64,7 @@ You need to supply the following environment variables (required ones are marked
 - 🚩 **MYSQL_USER** (`str`): mysql user.
 - **WAIT_FOR_IT_ADDRESS** (`str`): if is set, it will wait for the database to be ready for max 120 seconds. Must be set to `$MYSQL_HOST:$MYSQL_PORT`. This switch should not be used in Kubernetes deployments, as `initContainers` are designed to cover this exact use case.
 
-### Other
+#### Other
 
 - **LOCALE_WEEKDAY_NAMES** (`list(str)`): weekday names, starting with Monday and ending with Sunday. Must contain 7 elements (one for each week day).
 - **NULL_STR** (`str`): string to represent an empty `lunch1` or `dinner`. Defaults to `N/A`.
@@ -77,5 +72,3 @@ You need to supply the following environment variables (required ones are marked
 ## Future
 
 AWS and notion settings are currently needed. If you want to use this app without one of them (or both) add an issue and I'll make it optional and configurable.
-
-As said before, the docker image is designed to work on ARM systems. If you want AMD64 support please fill an issue.
