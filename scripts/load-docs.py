@@ -46,6 +46,7 @@ def load_docs(source: str, extra_week: bool):
 
     meals = filter_meals(meals)
 
+    MD_DIR.mkdir(exist_ok=True)
     for week, weekly_meals in groupby(meals, lambda x: x.id.isocalendar()[1]):
         weeks.append(week)
         weekly_meals = list(weekly_meals)
@@ -96,7 +97,6 @@ def get_default_md_text():
 
 def create_md(week: int, weekly_meals: List[Meal], override=True):
     """Creates the markdown file."""
-    MD_DIR.mkdir(exist_ok=True)
     md_filepath = MD_DIR / f"{week}.md"
     content = ""
     weekly_meals.sort(key=lambda x: x.id)
