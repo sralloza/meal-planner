@@ -7,6 +7,19 @@ from typing import Any, List
 from fastapi import Query
 from pydantic import parse_obj_as
 
+from ..models.meal import Meal
+from ..utils.misc import lowercase
+from .config import settings
+
+NULL_MAP = {
+    "lunch1": settings.NULL_STR,
+    "lunch1_frozen": False,
+    "lunch2": None,
+    "lunch2_frozen": False,
+    "dinner": settings.NULL_STR,
+    "dinner_frozen": False,
+}
+
 
 class SwapMode(Enum):
     """Valid swap modes."""
@@ -53,3 +66,22 @@ def swap_attrs(obj1: Any, obj2: Any, attrname: str):
 def set_attrs(old: Any, new: Any, attrnames: List[str]):
     for attr in attrnames:
         setattr(new, attr, getattr(old, attr))
+
+
+def can_override_meal_from_shift(meal: Meal, attrnames: List[str]) -> bool:
+    """Checks if the meal has all the attrs to null.
+
+    A meal can be shifted (override some attrs from other meal) if all
+    attrnames are considered null.
+    """
+
+    var_str = lowercase(settings.VARIABLE_STR)
+
+    for attrname in attrnames:
+        attr = lowercase(getattr(meal, attrname))
+        null_str = lowercase(NULL_MAP[attrname])
+        null_str = null_str.lower() if isinstance(null_str, str) else null_str
+
+        if attr not in (null_str, var_str):
+            return False
+    return True

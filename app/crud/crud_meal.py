@@ -7,20 +7,17 @@ from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
 from ..core.config import settings
-from ..core.meals import SwapMode, set_attrs, swap_attrs
+from ..core.meals import (
+    NULL_MAP,
+    SwapMode,
+    can_override_meal_from_shift,
+    set_attrs,
+    swap_attrs,
+)
 from ..crud.base import CRUDBase
 from ..models import Meal
 from ..schemas.meal import MealCreate, MealUpdate
-from ..utils.misc import get_current_week, lowercase
-
-NULL_MAP = {
-    "lunch1": settings.NULL_STR,
-    "lunch1_frozen": False,
-    "lunch2": None,
-    "lunch2_frozen": False,
-    "dinner": settings.NULL_STR,
-    "dinner_frozen": False,
-}
+from ..utils.misc import get_current_week
 
 
 class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
@@ -164,24 +161,6 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         meals_to_edit.sort(key=lambda x: x.id)
         return meals_to_edit
 
-    def can_override_meal_from_shift(self, meal: Meal, attrnames: List[str]) -> bool:
-        """Checks if the meal has all the attrs to null.
-
-        A meal can be shifted (override some attrs from other meal) if all
-        attrnames are considered null.
-        """
-
-        var_str = lowercase(settings.VARIABLE_STR)
-
-        for attrname in attrnames:
-            attr = lowercase(getattr(meal, attrname))
-            null_str = lowercase(NULL_MAP[attrname])
-            null_str = null_str.lower() if isinstance(null_str, str) else null_str
-
-            if attr not in (null_str, var_str):
-                return False
-        return True
-
     def get_days_to_shift(
         self, db: Session, first_meal: Meal, attrnames: List[str]
     ) -> List[Meal]:
@@ -195,7 +174,7 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
             next_day_meal = self.create(db, obj_in=new_meal)
             return [first_meal, next_day_meal]
 
-        if self.can_override_meal_from_shift(next_day_meal, attrnames):
+        if can_override_meal_from_shift(next_day_meal, attrnames):
             return [first_meal, next_day_meal]
 
         return self.get_days_to_shift(db, next_day_meal, attrnames) + [first_meal]
