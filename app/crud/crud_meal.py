@@ -7,20 +7,17 @@ from sqlalchemy import func
 from sqlalchemy.orm.session import Session
 
 from ..core.config import settings
-from ..core.meals import SwapMode, set_attrs, swap_attrs
+from ..core.meals import (
+    NULL_MAP,
+    SwapMode,
+    can_override_meal_from_shift,
+    set_attrs,
+    swap_attrs,
+)
 from ..crud.base import CRUDBase
 from ..models import Meal
 from ..schemas.meal import MealCreate, MealUpdate
 from ..utils.misc import get_current_week
-
-NULL_MAP = {
-    "lunch1": settings.NULL_STR,
-    "lunch1_frozen": False,
-    "lunch2": None,
-    "lunch2_frozen": False,
-    "dinner": settings.NULL_STR,
-    "dinner_frozen": False,
-}
 
 
 class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
@@ -175,6 +172,9 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
                 date=next_day_id, lunch1=settings.NULL_STR, dinner=settings.NULL_STR
             )
             next_day_meal = self.create(db, obj_in=new_meal)
+            return [first_meal, next_day_meal]
+
+        if can_override_meal_from_shift(next_day_meal, attrnames):
             return [first_meal, next_day_meal]
 
         return self.get_days_to_shift(db, next_day_meal, attrnames) + [first_meal]

@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     # Other
     LOCALE_WEEKDAY_NAMES: Optional[List[str]]
     NULL_STR = "N/A"
+    VARIABLE_STR = "Variable"
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
