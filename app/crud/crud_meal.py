@@ -164,6 +164,18 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
         meals_to_edit.sort(key=lambda x: x.id)
         return meals_to_edit
 
+    def can_override_meal_from_shift(self, meal: Meal, attrnames: List[str]) -> bool:
+        """Checks if the meal has all the attrs to null.
+
+        A meal can be shifted (override some attrs from other meal) if all
+        attrnames are considered null.
+        """
+
+        for attr in attrnames:
+            if getattr(meal, attr) != NULL_MAP[attr]:
+                return False
+        return True
+
     def get_days_to_shift(
         self, db: Session, first_meal: Meal, attrnames: List[str]
     ) -> List[Meal]:
@@ -175,6 +187,9 @@ class CRUDMeal(CRUDBase[Meal, MealCreate, MealUpdate]):
                 date=next_day_id, lunch1=settings.NULL_STR, dinner=settings.NULL_STR
             )
             next_day_meal = self.create(db, obj_in=new_meal)
+            return [first_meal, next_day_meal]
+
+        if self.can_override_meal_from_shift(next_day_meal, attrnames):
             return [first_meal, next_day_meal]
 
         return self.get_days_to_shift(db, next_day_meal, attrnames) + [first_meal]
