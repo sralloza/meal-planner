@@ -18,12 +18,14 @@ Features:
 
 Deployment is done via docker.
 
+**Note: these are the commands to create a release manually on your computer. You don't have to do this. The docker images are compiled with github actions, in the [publish workflow](.github/workflows/publish.yml).**
+
 ```shell
 # Build and push it to dockerhub
-docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --push .
+docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64,linux/arm64 --push .
 
 # Build without pushing it to dockerhub
-docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64 --load .
+docker buildx build -t sralloza/meal-planner:$VERSION --platform=linux/arm/v7,linux/amd64,linux/arm64 --load .
 ```
 
 ### Environment
