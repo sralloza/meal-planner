@@ -24,7 +24,11 @@ MD_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".md" and x.stem.isd
 YML_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".yml"]
 JSON_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".json"]
 
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+try:
+    locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
+
 yaml = YAML()
 
 
