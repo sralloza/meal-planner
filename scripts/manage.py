@@ -109,6 +109,12 @@ def upload_yml(date: str, api_url: str, dry_run: bool):
         upload_json(date, api_url)
 
 
+@cli.command("yml-json")
+@click.argument("date", metavar="DATE", type=click.Choice(YML_FILES))
+def convert_yml_json_cli(date: str):
+    convert_yml_json(date)
+
+
 def convert_yml_json(date: str):
     filepath = MD_DIR / f"{date}.yml"
     with filepath.open("rt", encoding="utf8") as fh:
