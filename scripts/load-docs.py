@@ -24,7 +24,11 @@ ORIGINAL_MKDOCS_URL = (
 )
 MD_DIR = Path(__file__).parent.with_name("docs")
 MKDOCS_YML_PATH = Path(__file__).parent.parent / "mkdocs.yml"
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+
+try:
+    locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
 
 yml = YAML()
 yml.indent(offset=2, sequence=4)
