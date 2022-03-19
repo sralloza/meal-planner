@@ -4,6 +4,8 @@ from typing import TypeVar
 
 from toml import loads
 
+from ..core.config import settings
+
 T = TypeVar("T")
 
 
@@ -20,3 +22,11 @@ def lowercase(obj: T) -> T:
     if isinstance(obj, str):
         return obj.lower()
     return obj
+
+
+def lowercase_equals(str1, str2):
+    return lowercase(str1) == lowercase(str2)
+
+
+def is_variable(obj):
+    return lowercase_equals(obj, settings.VARIABLE_STR)

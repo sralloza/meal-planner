@@ -5,6 +5,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
+from app.utils.misc import is_variable, lowercase
+
 from ..core.notion import create_notion_block
 
 
@@ -36,6 +38,17 @@ class BaseMeal(BaseSimpleMeal):
             out.append(f"{self.lunch2.lower()} (C2)")
         if self.dinner_frozen:
             out.append(f"{self.dinner.lower()} (D)")
+        return out
+
+    @property
+    def variable(self) -> List[str]:
+        out = []
+        if is_variable(self.lunch1):
+            out.append(f"{lowercase(self.lunch1)} (C1)")
+        if is_variable(self.lunch2):
+            out.append(f"{lowercase(self.lunch2)} (C2)")
+        if is_variable(self.dinner):
+            out.append(f"{lowercase(self.dinner)} (D)")
         return out
 
     def to_notion_blocks(self):

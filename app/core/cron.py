@@ -2,7 +2,12 @@
 
 from enum import Enum
 
-from ..cron import backup_database, check_frozen_meals, update_notion_meals
+from ..cron import (
+    backup_database,
+    check_frozen_meals,
+    check_variable_meals,
+    update_notion_meals,
+)
 
 
 class ValidCron(Enum):
@@ -10,11 +15,13 @@ class ValidCron(Enum):
 
     BACKUP_DATABASE = "backup-database"
     CHECK_FROZEN_MEALS = "check-frozen-meals"
+    CHECK_VARIABLE_MEALS = "check-variable-meals"
     UPDATE_NOTION_MEALS = "update-notion-meals"
 
 
 CRON_MAP = {
     ValidCron.BACKUP_DATABASE: backup_database,
     ValidCron.CHECK_FROZEN_MEALS: check_frozen_meals,
+    ValidCron.CHECK_VARIABLE_MEALS: check_variable_meals,
     ValidCron.UPDATE_NOTION_MEALS: update_notion_meals,
 }
