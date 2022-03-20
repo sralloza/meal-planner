@@ -16,19 +16,18 @@ def check_variable_meals():
         dat_meal_db = crud.meal.get_by_date_delta(db, delta_days=2)
 
     if tomorrow_meal_db:
-        add_task_if_variable(db, tomorrow_meal_db, True)
+        add_task_if_variable(tomorrow_meal_db, True)
     if dat_meal_db:
-        add_task_if_variable(db, dat_meal_db, False)
+        add_task_if_variable(dat_meal_db, False)
 
 
-def add_task_if_variable(db, meal_db: models.Meal, urgent: bool):
+def add_task_if_variable(meal_db: models.Meal, urgent: bool):
     """Adds a task to define variable meal fields if meal_db has variable meal fields.
 
     If urgent is True, the added task will be due today 18:00 (frozen check run as 19:00).
     Otherwise the added task will be due today at 21:00.
 
     Args:
-        db (Session): database session.
         meal_db (models.Meal): meal from database.
         urgent (bool): True if it's tomorrow meal, False otherwise.
     """
