@@ -1,4 +1,4 @@
-FROM python:3.9.7-alpine3.14
+FROM python:3.9.12-slim-buster
 
 WORKDIR /code
 
@@ -9,9 +9,11 @@ ENV WAIT_FOR_IT_URL https://raw.githubusercontent.com/vishnubob/wait-for-it/mast
 
 EXPOSE ${PORT}
 
-RUN apk update && \
-    apk upgrade && \
-    apk add curl gcc musl-dev build-base bash
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y curl bash
+
+RUN python -m pip install --upgrade pip
 
 # Install Poetry
 RUN curl -sSL ${GET_POETRY} | POETRY_HOME=/opt/poetry python && \
@@ -39,7 +41,3 @@ COPY ./entrypoint.sh /
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-
-# CMD ["which", "poetry", "&&", "which", "uvicorn"]
-# ENTRYPOINT ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", ${PORT}]
-# CMD "app.main:app", "--host", "0.0.0.0", "--port", ${PORT}

@@ -14,5 +14,5 @@ python ./scripts/ensure-database.py
 echo "Upgrading database"
 alembic upgrade head
 
-echo "Launching uvicorn server"
-exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+echo "Launching hypercorn server"
+exec hypercorn app.main:app -b 0.0.0.0:${PORT}
