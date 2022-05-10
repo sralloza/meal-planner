@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meal-planner"
-version = "1.8.1"
+version = "1.8.2"
 description = ""
 authors = ["Diego Alloza González <sralloza@gmail.com>"]
 packages = [
@@ -10,7 +10,7 @@ packages = [
 [tool.poetry.dependencies]
 APScheduler = "^3.8.0"
 boto3 = "^1.18.52"
-fastapi = "^0.69.0"
+fastapi = "^0.77.0"
 greenlet = "^1.1.2"
 PyMySQL = "^1.0.2"
 python = ">=3.7,<3.10"
@@ -21,7 +21,7 @@ SQLAlchemy-Utils = "^0.37.8"
 starlette-prometheus = "^0.8.0"
 todoist-python = "^8.1.3"
 toml = "^0.10.2"
-uvicorn = "^0.15.0"
+uvicorn = {extras = ["standard"], version = "^0.17.6"}
 alembic = "^1.7.4"
 
 [tool.poetry.dev-dependencies]
