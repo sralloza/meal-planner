@@ -1,7 +1,7 @@
 """Load docs script."""
 
 import locale
-from datetime import datetime
+from datetime import date, datetime
 from io import StringIO
 from itertools import groupby
 from pathlib import Path
@@ -24,7 +24,11 @@ ORIGINAL_MKDOCS_URL = (
 )
 MD_DIR = Path(__file__).parent.with_name("docs")
 MKDOCS_YML_PATH = Path(__file__).parent.parent / "mkdocs.yml"
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+
+try:
+    locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
 
 yml = YAML()
 yml.indent(offset=2, sequence=4)
@@ -53,7 +57,7 @@ def load_docs(source: str, extra_week: bool):
         create_md(week, weekly_meals)
 
     if extra_week and week:
-        current_week = datetime.now().isocalendar().week
+        current_week = get_week_from_date(datetime.now())
         next_week = current_week + 1 if current_week != 52 else 1
 
         weeks.append(next_week)
@@ -63,12 +67,19 @@ def load_docs(source: str, extra_week: bool):
     rebuild_mkdocs_yml(weeks)
 
 
+def get_week_from_date(ts: date) -> int:
+    try:
+        return ts.isocalendar().week
+    except AttributeError:
+        return ts.isocalendar()[1]
+
+
 def filter_meals(meals: List[Meal]) -> List[Meal]:
     ts_1 = datetime.now().date()
     ts_0 = ts_1 - relativedelta(months=1)
 
-    week_0 = ts_0.isocalendar().week
-    week_1 = ts_1.isocalendar().week
+    week_0 = get_week_from_date(ts_0)
+    week_1 = get_week_from_date(ts_1)
 
     week_0 = week_0 + 1 if week_0 != 52 else 1
 
@@ -77,7 +88,7 @@ def filter_meals(meals: List[Meal]) -> List[Meal]:
     else:
         valid_weeks = tuple(range(week_0, week_1 + 3))
 
-    return [x for x in meals if x.id.isocalendar().week in valid_weeks]
+    return [x for x in meals if get_week_from_date(x.id) in valid_weeks]
 
 
 def get_weekdays():

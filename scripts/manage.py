@@ -24,7 +24,11 @@ MD_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".md" and x.stem.isd
 YML_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".yml"]
 JSON_FILES = [x.stem for x in MD_DIR.iterdir() if x.suffix == ".json"]
 
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+try:
+    locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+except locale.Error:
+    locale.setlocale(locale.LC_ALL, "es_ES.UTF-8")
+
 yaml = YAML()
 
 
@@ -103,6 +107,12 @@ def upload_yml(date: str, api_url: str, dry_run: bool):
     convert_yml_json(date)
     if not dry_run:
         upload_json(date, api_url)
+
+
+@cli.command("yml-json")
+@click.argument("date", metavar="DATE", type=click.Choice(YML_FILES))
+def convert_yml_json_cli(date: str):
+    convert_yml_json(date)
 
 
 def convert_yml_json(date: str):
