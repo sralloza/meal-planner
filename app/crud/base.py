@@ -50,9 +50,7 @@ class CRUDBase(Generic[Model, CreateSchema, UpdateSchema]):
             return obj
         return self.raise_not_found_error(id=id)
 
-    def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> List[Model]:
+    def get_multi(self, db: Session, *, skip: int = 0, limit: int = 100) -> List[Model]:
         """Get multiple objects."""
 
         return db.query(self.model).offset(skip).limit(limit).all()
