@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-source /home/sralloza/Documents/meal-planner/.venv/bin/activate
 
 : ${MEAL_PLANNER_API_TOKEN:?must set \$MEAL_PLANNER_API_TOKEN}
 

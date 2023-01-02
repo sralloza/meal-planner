@@ -15,14 +15,14 @@ services:
 
       # If you don't have this environment variables in your
       # terminal, put them in the .env file
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
     ports:
       - "8000:8000"
 
 
   database:
-    image: mysql:5.7
+    image: mysql:oracle
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=meal-planner
