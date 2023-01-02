@@ -24,6 +24,7 @@ toml = "^0.10.2"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 alembic = "^1.7.7"
 pydantic = "^1.10.4"
+cryptography = "^39.0.0"
 
 [tool.poetry.dev-dependencies]
 "ruamel.yaml" = "^0.17.16"
