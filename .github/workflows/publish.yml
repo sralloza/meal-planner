@@ -41,5 +41,6 @@ jobs:
         with:
           context: .
           platforms: linux/amd64,linux/arm64, linux/arm/v7
+          file: delivery/Dockerfile
           push: true
           tags: "sralloza/meal-planner:${{ steps.project_version.outputs.version }}"
