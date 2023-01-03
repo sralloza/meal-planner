@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meal-planner"
-version = "1.9.0"
+version = "1.9.0-rc1"
 description = ""
 authors = ["Diego Alloza González <sralloza@gmail.com>"]
 packages = [
@@ -13,7 +13,7 @@ boto3 = "^1.18.52"
 fastapi = "^0.88.0"
 greenlet = "^2.0.1"
 PyMySQL = "^1.0.2"
-python = ">=3.7,<3.11"
+python = "^3.10"
 python-dotenv = "^0.19.0"
 requests = "^2.26.0"
 SQLAlchemy = "^1.4.25"
@@ -36,7 +36,7 @@ mkdocs-material = "^7.3.2"
 pytest = "^5.2"
 pytest-cov = "^2.10.1"
 python-dateutil = "^2.8.2"
-pylint = "^2.11.1"
+pylint = "^2.15.9"
 
 
 [build-system]
