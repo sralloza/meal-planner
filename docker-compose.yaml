@@ -2,10 +2,16 @@ version: "3.8"
 
 services:
   app:
-    build: .
-    env_file:
-      - .env
+    build:
+      context: .
+      dockerfile: delivery/Dockerfile
     environment:
+      - API_TOKEN=ea47540d-6bc8-43b6-bae8-233cc904fdd0
+      - S3_BUCKET_NAME=meal-planner-bucket
+      - NOTION_BLOCK_ID=d63fff16-d646-4ed9-932a-f3917c0c5800
+      - NOTION_KEY=whatever
+      - TODOIST_PROJECT_ID=123456789
+      - TODOIST_TOKEN=whatever
       - MYSQL_USER=root
       - MYSQL_PASSWORD=root
       - MYSQL_HOST=database
