@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meal-planner"
-version = "1.9.0-rc2"
+version = "1.9.0"
 description = ""
 authors = ["Diego Alloza González <sralloza@gmail.com>"]
 packages = [
